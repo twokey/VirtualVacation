@@ -2,7 +2,7 @@
 //  Image+CoreDataProperties.swift
 //  VirtualVacation
 //
-//  Created by Kirill Kudymov on 2017-04-29.
+//  Created by Kirill Kudymov on 2017-05-30.
 //  Copyright © 2017 Kirill Kudymov. All rights reserved.
 //
 
