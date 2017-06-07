@@ -70,7 +70,7 @@
         <!--Pictures Table View Controller-->
         <scene sceneID="ax5-AG-C5T">
             <objects>
-                <tableViewController storyboardIdentifier="albumCollectionViewController" id="phY-wx-roj" customClass="PicturesTableViewController" customModule="VirtualVacation" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="albumTableViewController" id="phY-wx-roj" customClass="PicturesTableViewController" customModule="VirtualVacation" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="vqx-jB-OzF">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -91,14 +91,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Ncl-Na-p8T">
-                                            <rect key="frame" x="16" y="5" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="15" y="5" width="33.5" height="20.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0Vv-eS-uCk">
-                                            <rect key="frame" x="16" y="25.5" width="44" height="14.5"/>
+                                            <rect key="frame" x="15" y="25.5" width="44" height="14.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <nil key="textColor"/>
@@ -118,7 +118,60 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iCR-9A-Z6p" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="977" y="123"/>
+            <point key="canvasLocation" x="986" y="-133"/>
+        </scene>
+        <!--Pictures Collection View Controller-->
+        <scene sceneID="4r9-rh-IUi">
+            <objects>
+                <collectionViewController storyboardIdentifier="albumCollectionViewController" id="0z2-nO-0wx" customClass="PicturesCollectionViewController" customModule="VirtualVacation" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" id="aWu-fA-nuQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="UJS-Uw-fUr">
+                            <size key="itemSize" width="150" height="150"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CollectionCell" id="TUh-2G-jIi" customClass="PicturesCollectionViewCell" customModule="VirtualVacation" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="pe7-tw-WtU">
+                                            <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
+                                            <color key="backgroundColor" red="0.68424499029999997" green="0.883533597" blue="0.95911616089999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </imageView>
+                                    </subviews>
+                                </view>
+                                <constraints>
+                                    <constraint firstItem="pe7-tw-WtU" firstAttribute="top" secondItem="TUh-2G-jIi" secondAttribute="top" id="3rg-Uo-RFw"/>
+                                    <constraint firstItem="pe7-tw-WtU" firstAttribute="leading" secondItem="TUh-2G-jIi" secondAttribute="leading" id="Rcu-yV-xm4"/>
+                                    <constraint firstAttribute="trailing" secondItem="pe7-tw-WtU" secondAttribute="trailing" id="bDS-hs-Rch"/>
+                                    <constraint firstAttribute="bottom" secondItem="pe7-tw-WtU" secondAttribute="bottom" id="h7O-Ar-ANi"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="cellImageView" destination="pe7-tw-WtU" id="dP5-VU-euS"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="0z2-nO-0wx" id="BUO-h7-YBs"/>
+                            <outlet property="delegate" destination="0z2-nO-0wx" id="T9b-jQ-8Sp"/>
+                        </connections>
+                    </collectionView>
+                    <connections>
+                        <outlet property="collectionView" destination="aWu-fA-nuQ" id="L2V-ma-dfz"/>
+                        <outlet property="flowLayout" destination="UJS-Uw-fUr" id="3a8-ES-sX0"/>
+                    </connections>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4OS-sY-ds5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="984.79999999999995" y="566.26686656671666"/>
         </scene>
     </scenes>
 </document>

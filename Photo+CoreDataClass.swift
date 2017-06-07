@@ -11,5 +11,29 @@ import CoreData
 
 @objc(Photo)
 public class Photo: NSManagedObject {
+    
+    convenience init(vacationLocation: VacationLocation, title: String = "photoName", imageObject: Image, thumbnail: NSData, latitude: Double, longitude: Double, context: NSManagedObjectContext ) {
+        
+        // An EntityDescription is an object that has access to all
+        // the information you provided in the Entity part of the model
+        // you need it to create an instance of this class.
+        
+        if let ent = NSEntityDescription.entity(forEntityName: "Photo", in: context) {
+            self.init(entity: ent, insertInto: context)
+            
+            self.vacationLocation = vacationLocation
+            self.title = title
+            self.image = imageObject
+            self.thumbnail = thumbnail
+            self.creationDate = Date() as NSDate
+            self.id = Int32(Date().timeIntervalSince1970)
+            self.latitude = latitude
+            self.longitude = longitude
+            self.vacationLocationId = vacationLocation.id
+        } else {
+            fatalError("Unable to find Photo entity name")
+        }
 
+    }
+        
 }

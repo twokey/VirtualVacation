@@ -15,7 +15,6 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     // MARK: Properties
     
-//    var vacationLocations = [VacationLocation]()
     var sharedContext = CoreDataStack.sharedInstance().persistentContainer.viewContext
     
     fileprivate lazy var fetchedResultsController: NSFetchedResultsController<VacationLocation> = {
@@ -48,18 +47,17 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         // Configure mapView
         mapView.delegate = self
+        CoreDataStack.sharedInstance().applicationDocumentsDirectory()
         
-        // Get Core Data stack
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-//            return
-//        }
-        
-        //let context = appDelegate.persistentContainer.viewContext
-//        do {
-//            vacationLocations = try sharedContext.fetch(VacationLocation.fetchRequest())
-//        } catch {
-//            print("Annotation fetch failed")
-//        }
+        // Clean table Photo (and Images)
+        let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
+        let request = NSBatchDeleteRequest(fetchRequest: fetch)
+        do {
+            _ = try sharedContext.execute(request)
+            print("Photos have been cleaned successfuly")
+        } catch {
+            print("Couldn't clean the Photo entity")
+        }
         
         // Start the Fetched Results Controller
         do {
@@ -124,13 +122,7 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         DispatchQueue.main.async {
             self.mapView.addAnnotation(annotation)
-            
-            // Get context
-//            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-//                return
-//            }
-//            let context = appDelegate.persistentContainer.viewContext
-            
+                        
             // Create and configure vacationLocation
             let vacationLocation = VacationLocation(context: self.sharedContext)
             vacationLocation.title = annotation.title
@@ -139,47 +131,8 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
             vacationLocation.longitude = annotation.coordinate.longitude
             vacationLocation.creationDate = Date() as NSDate
             vacationLocation.id = Int32(Date().timeIntervalSince1970)
-            
-            let photoNames = ["Photo-1", "Photo-2", "Photo-3"]
-            
-            for photoName in photoNames {
-
-                let image = UIImage(named: photoName)!
-                
-                guard let imageData = UIImageJPEGRepresentation(image, 1.0) else {
-                    print("Image conversion to JPEG failed")
-                    return
-                }
-                
-                let thumbnail = image.scale(toSize: self.view.frame.size)
-                guard let thumbnailData = UIImageJPEGRepresentation(thumbnail, 0.7) else {
-                    print("Thumbnail conversion to JPEG failed")
-                    return
-                }
-
-                // Create photo
-                let photo = Photo(context: self.sharedContext)
-                
-                // Create and configure image object
-                let imageObject = Image(context: self.sharedContext)
-                imageObject.fullResolution = imageData as NSData
-                imageObject.photo = photo
-                
-                // Configure photo object
-                photo.vacationLocation = vacationLocation
-                photo.title = photoName
-                photo.image = imageObject
-                photo.thumbnail = thumbnailData as NSData
-                photo.creationDate = Date() as NSDate
-                photo.id = Int32(Date().timeIntervalSince1970)
-                photo.latitude = vacationLocation.latitude
-                photo.longitude = vacationLocation.longitude
-                photo.vacationLocationId = vacationLocation.id
-            }
-            print("success?")
         }
     }
-    
 }
 
 
@@ -190,23 +143,13 @@ extension MapViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped: UIControl) {
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let albumCollectionViewController = storyboard.instantiateViewController(withIdentifier: "albumCollectionViewController") as! PicturesTableViewController
-   //     albumCollectionViewController.coordinates = annotationView.annotation?.coordinate
+        let albumCollectionViewController = storyboard.instantiateViewController(withIdentifier: "albumCollectionViewController") as! PicturesCollectionViewController
+
         let latitude = annotationView.annotation?.coordinate.latitude
         let longitude = annotationView.annotation?.coordinate.longitude
+        albumCollectionViewController.locationCoordinate = CLLocationCoordinate2D(latitude: latitude!, longitude: longitude!)
         
-        let predicate = NSPredicate(format: "latitude = %@", argumentArray: [latitude!])
-        print(predicate)
-        let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
-        fetchRequest.predicate = predicate
-        fetchRequest.sortDescriptors = []
-        
-        
-        albumCollectionViewController.fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: sharedContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        //present(albumCollectionViewController, animated: true, completion: nil)
-        self.navigationController?.pushViewController(albumCollectionViewController, animated: true)
-        
+        self.navigationController?.pushViewController(albumCollectionViewController, animated: true)        
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {

@@ -22,16 +22,6 @@ class CoreDataStack {
     }
     
     
-    // MARK: Properties
-    
-//    private let SQLITE_FILE_NAME = "VirtualVacation.sqlite"
-//    
-//    lazy var applicationDocumentsDirectory: URL = {
-//        
-//        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//        return urls[urls.count - 1]
-//    }()
-    
     // MARK: The Core Data stack. The code has been moved, unaltered, from AppDelegate
     
     lazy var persistentContainer: NSPersistentContainer = {
@@ -73,17 +63,33 @@ class CoreDataStack {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                fatalError("Unresolved error \(nserror)")
             }
         }
     }
     
     func dropAllData() throws {
         
-        let storeURL = persistentContainer.persistentStoreCoordinator.persistentStores.first!.url!
-        // Delete all the objects in the db. This won't delete the files, it will just leave empty tables
-        try persistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: storeURL, ofType: NSSQLiteStoreType, options: nil)
-        try persistentContainer.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+        if let storeURL = persistentContainer.persistentStoreCoordinator.persistentStores.first!.url {
+            // Delete all the objects in the db. This won't delete the files, it will just leave empty tables
+            try persistentContainer.persistentStoreCoordinator.destroyPersistentStore(at: storeURL, ofType: NSSQLiteStoreType, options: nil)
+            try persistentContainer.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+        }
+    }
+    
+    
+    // MARK: - Path to the SQLite file on device
+    
+    func applicationDocumentsDirectory() {
+//        if let url = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).last {
+//            print(url.absoluteString)
+//        }
+        
+        if let storeURL = persistentContainer.persistentStoreCoordinator.persistentStores.first!.url {
+            // get me path to the database file
+            print("Path to the store: \(storeURL)")
+        }
+
     }
 
 }
