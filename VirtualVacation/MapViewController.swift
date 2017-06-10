@@ -15,7 +15,19 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     // MARK: Properties
     
-    var sharedContext = CoreDataStack.sharedInstance().persistentContainer.viewContext
+    // Dictionary with initial region of the map loaded from User Defaults
+    lazy var mapViewRegionDictionary: [String : Double] = {
+       return UserDefaults.standard.dictionary(forKey: "mapViewRegion") as! [String : Double]
+    }()
+    
+    // Initialize initial region of the map
+    lazy var mapViewRegion: MKCoordinateRegion = {
+        let center = CLLocationCoordinate2DMake(self.mapViewRegionDictionary["center_latitude"]!, self.mapViewRegionDictionary["center_longitude"]!)
+        let span = MKCoordinateSpan(latitudeDelta: self.mapViewRegionDictionary["latitude_delta"]!, longitudeDelta: self.mapViewRegionDictionary["longitude_delta"]!)
+        return MKCoordinateRegion(center: center, span: span)
+    }()
+    
+    var sharedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
     
     fileprivate lazy var fetchedResultsController: NSFetchedResultsController<VacationLocation> = {
         
@@ -30,6 +42,13 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         // Configure Fetched Results Controller
         fetchedResultsController.delegate = self
+        
+        // Start the Fetched Results Controller
+        do {
+            try fetchedResultsController.performFetch()
+        } catch let error as NSError {
+            print("Error performing initial fetch: \(error)")
+        }
         
         return fetchedResultsController
     }()
@@ -47,7 +66,8 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         
         // Configure mapView
         mapView.delegate = self
-        CoreDataStack.sharedInstance().applicationDocumentsDirectory()
+        mapView.setRegion(mapViewRegion, animated: true)
+//        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
         
         // Clean table Photo (and Images)
         let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
@@ -59,12 +79,12 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
             print("Couldn't clean the Photo entity")
         }
         
-        // Start the Fetched Results Controller
-        do {
-            try fetchedResultsController.performFetch()
-        } catch let error as NSError {
-            print("Error performing initial fetch: \(error)")
-        }
+//        // Start the Fetched Results Controller
+//        do {
+//            try fetchedResultsController.performFetch()
+//        } catch let error as NSError {
+//            print("Error performing initial fetch: \(error)")
+//        }
         
         for location in fetchedResultsController.fetchedObjects! {
             let annotation = MKPointAnnotation()
@@ -131,12 +151,14 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
             vacationLocation.longitude = annotation.coordinate.longitude
             vacationLocation.creationDate = Date() as NSDate
             vacationLocation.id = Int32(Date().timeIntervalSince1970)
+            
+            CoreDataStack.sharedInstance.saveContext()
         }
     }
 }
 
 
-// MARK: - MapView Extension
+// MARK: - MapView Delegate
 
 extension MapViewController: MKMapViewDelegate {
     
@@ -169,36 +191,17 @@ extension MapViewController: MKMapViewDelegate {
         
         return view
     }
-}
-
-
-// MARK: - CGSize extension
-
-extension CGSize {
     
-    func resizeFill(toSize: CGSize) -> CGSize {
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
-        let scale : CGFloat = (self.height / self.width) < (toSize.height / toSize.width) ? (self.height / toSize.height) : (self.width / toSize.width)
-        return CGSize(width: (self.width / scale), height: (self.height / scale))
+        mapViewRegionDictionary = ["center_latitude" : mapView.region.center.latitude,
+                                       "center_longitude" : mapView.region.center.longitude,
+                                       "latitude_delta" : mapView.region.span.latitudeDelta,
+                                       "longitude_delta" : mapView.region.span.longitudeDelta]
+        
+        UserDefaults.standard.set(mapViewRegionDictionary, forKey: "mapViewRegion")
+        print("User Defaults updated with new region \n \(mapViewRegionDictionary)")
+        
     }
 }
 
-
-// MARK: - UIImage extension
-
-extension UIImage {
-    
-    func scale(toSize newSize:CGSize) -> UIImage {
-        
-        // make sure the new size has the correct aspect ratio
-        let aspectFill = self.size.resizeFill(toSize: newSize)
-        
-        UIGraphicsBeginImageContextWithOptions(aspectFill, false, 0.0);
-        self.draw(in: CGRect(x: 0, y: 0, width: aspectFill.width, height: aspectFill.height))
-        let newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        return newImage
-    }
-    
-}

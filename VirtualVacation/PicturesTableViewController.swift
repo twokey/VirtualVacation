@@ -15,7 +15,7 @@ class PicturesTableViewController: CoreDataTableViewController {
     
     // MARK: Properites
     
-    var sharedContext = CoreDataStack.sharedInstance().persistentContainer.viewContext
+    var sharedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
     var locationCoordinate = CLLocationCoordinate2D()
     
     fileprivate lazy var vacationLocation: VacationLocation = {
@@ -103,7 +103,7 @@ class PicturesTableViewController: CoreDataTableViewController {
 //                        photo.vacationLocationId = self.vacationLocation.id
                         
                         let photo = Photo(vacationLocation: self.vacationLocation, title: "No title", imageObject: imageObject, thumbnail: thumbnailJPEGData as NSData, latitude: self.locationCoordinate.latitude, longitude: self.locationCoordinate.longitude, context: self.sharedContext)
-                        CoreDataStack.sharedInstance().saveContext()
+                        CoreDataStack.sharedInstance.saveContext()
                         objectsSaved += 1
                     }
                 }

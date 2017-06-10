@@ -13,13 +13,19 @@ class CoreDataStack {
     
     
     // MARK: Shared Instance
-    class func sharedInstance() -> CoreDataStack {
-        struct Static {
-            static let instance = CoreDataStack()
-        }
+
+    static let sharedInstance = CoreDataStack()
+
+    
+    // MARK: Background Context
+    
+    lazy var backgroundContext: NSManagedObjectContext = {
         
-        return Static.instance
-    }
+        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        backgroundContext.parent = self.persistentContainer.viewContext
+        
+        return backgroundContext
+    }()
     
     
     // MARK: The Core Data stack. The code has been moved, unaltered, from AppDelegate
@@ -50,11 +56,11 @@ class CoreDataStack {
         })
         return container
     }()
-
+    
     
     // MARK: - Core Data Saving support
     
-    func saveContext () {
+    public func saveContext () {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -68,7 +74,7 @@ class CoreDataStack {
         }
     }
     
-    func dropAllData() throws {
+    public func dropAllData() throws {
         
         if let storeURL = persistentContainer.persistentStoreCoordinator.persistentStores.first!.url {
             // Delete all the objects in the db. This won't delete the files, it will just leave empty tables
@@ -81,15 +87,35 @@ class CoreDataStack {
     // MARK: - Path to the SQLite file on device
     
     func applicationDocumentsDirectory() {
-//        if let url = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).last {
-//            print(url.absoluteString)
-//        }
         
         if let storeURL = persistentContainer.persistentStoreCoordinator.persistentStores.first!.url {
             // get me path to the database file
             print("Path to the store: \(storeURL)")
         }
-
     }
-
 }
+
+
+// MARK: - CoreDataStack (Batch Processing in the Background)
+
+extension CoreDataStack {
+    
+    typealias Batch = (_ workerContext: NSManagedObjectContext) -> ()
+    
+    func performBackgroundBatchOperation(_ batch: @escaping Batch) {
+        
+        backgroundContext.perform() {
+            
+            batch(self.backgroundContext)
+            
+            // Save it to the parent context, so normal saving
+            // can work
+            do {
+                try self.backgroundContext.save()
+            } catch {
+                fatalError("Error while saving backgroundContext: \(error)")
+            }
+        }
+    }
+}
+
