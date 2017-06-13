@@ -13,10 +13,13 @@ import UIKit
 
 // MARK: - CoreDataCollectionViewController
 
-class CoreDataCollectionViewController: UICollectionViewController {
+class CoreDataCollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     
     // MARK: Properties
+    
+    var collectionView: UICollectionView?
+    
     
     // The selected indexes array keeps all of the indexPaths for cells that are "selected". The array is
     // used inside cellForItemAtIndexPath to lower the alpha of selected cells.  You can see how the array
@@ -33,18 +36,11 @@ class CoreDataCollectionViewController: UICollectionViewController {
             // Whenever the frc changes, we execute the search and reload the table
             executeSearch()
             self.collectionView?.reloadData()
-            print("Collection view reloaded")
         }
     }
     
     
     // MARK: Initializers
-    
-    init(fetchedResultsController frc: NSFetchedResultsController<NSFetchRequestResult>, flowLayout: UICollectionViewLayout) {
-        fetchedResultsCollectionController = frc
-        super.init(collectionViewLayout: flowLayout)
-    }
-
     
     // This initializer has to be implemented because of the way Swift interfaces with NSArchiving.
     required init?(coder aDecoder: NSCoder) {
@@ -54,7 +50,7 @@ class CoreDataCollectionViewController: UICollectionViewController {
     
     // MARK: UICollectionViewDataSource
     
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         if let frc = fetchedResultsCollectionController  {
             return (frc.sections?.count)!
         } else {
@@ -62,24 +58,24 @@ class CoreDataCollectionViewController: UICollectionViewController {
         }
     }
     
-//    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        if let frc = fetchedResultsCollectionController {
-//            //print("Number of items: \(frc.sections![section].numberOfObjects)")
-//            return frc.sections![section].numberOfObjects
-//        } else {
-//            return 0
-//        }
-//    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let frc = fetchedResultsCollectionController {
+            //print("Number of items: \(frc.sections![section].numberOfObjects)")
+            return frc.sections![section].numberOfObjects
+        } else {
+            return 0
+        }
+    }
     
     
     // MARK: - CoreDataCollectionViewController (Subclass Must Implement)
     
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         fatalError("This method MUST be implemented by a subclass of CoreDataCollectionViewController")
     }
     
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("in collectionView(_:didSelectItemAtIndexPath)")
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
         let cell = collectionView.cellForItem(at: indexPath) as! PicturesCollectionViewCell
         
         // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
@@ -92,6 +88,9 @@ class CoreDataCollectionViewController: UICollectionViewController {
         // Then reconfigure the cell
         configureCell(cell, atIndexPath: indexPath)
         
+        // Configure interface
+        configureInterface(selectedIndexes.count)
+        
     }
     
     
@@ -101,15 +100,13 @@ class CoreDataCollectionViewController: UICollectionViewController {
         if let frc = fetchedResultsCollectionController {
             do {
                 try frc.performFetch()
-                print("Fetch request is performed")
             } catch let e as NSError {
                 print("Error while trying to perform a search: \n\(e)")
             }
         }
     }
     
-    func configureCell(_ cell: PicturesCollectionViewCell, atIndexPath indexPath: IndexPath) {
-        print("in configureCell")
+    private func configureCell(_ cell: PicturesCollectionViewCell, atIndexPath indexPath: IndexPath) {
         
         // If the cell is "selected", its color panel is grayed out
         // we use the Swift `find` function to see if the indexPath is in the array
@@ -120,6 +117,13 @@ class CoreDataCollectionViewController: UICollectionViewController {
             cell.cellImageView?.alpha = 1.0
         }
     }
+    
+    
+    // Subclass will implement if neccessary
+    func configureInterface(_ cellSelected: Int) {
+        
+    }
+    
 }
 
 
@@ -177,8 +181,13 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
     // Notice that all of the changes are performed inside a closure that is handed to the collection view.
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         
-//        print("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
+        print("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
         
+        updateCollectionView()
+        
+    }
+    
+    func updateCollectionView() {
         self.collectionView?.performBatchUpdates({() -> Void in
             
             for indexPath in self.insertedIndexPaths {

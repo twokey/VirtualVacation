@@ -67,6 +67,22 @@
             </objects>
             <point key="canvasLocation" x="87" y="123"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="yv3-CO-qDD">
+            <objects>
+                <navigationController id="ybU-QP-cxl" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="VTX-Cr-ZyP">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="Mop-ri-EXP" kind="relationship" relationship="rootViewController" id="5QW-2p-OjF"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="583-DW-i4f" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="962" y="123"/>
+        </scene>
         <!--Pictures Collection View Controller-->
         <scene sceneID="h7d-R3-94I">
             <objects>
@@ -84,10 +100,13 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="yPD-Ua-GQS"/>
                                 </constraints>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="Reload Album"/>
+                                <connections>
+                                    <action selector="updateAlbum:" destination="Mop-ri-EXP" eventType="touchUpInside" id="Wos-W7-RMT"/>
+                                </connections>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GuP-HU-wNn">
-                                <rect key="frame" x="0.0" y="20" width="375" height="617"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="573"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r64-Vn-LT3">
                                     <size key="itemSize" width="119" height="119"/>
@@ -103,7 +122,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="119" height="119"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1fa-4y-D76">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1fa-4y-D76">
                                                     <rect key="frame" x="0.0" y="0.0" width="119" height="119"/>
                                                 </imageView>
                                             </subviews>
@@ -124,6 +143,18 @@
                                     <outlet property="delegate" destination="Mop-ri-EXP" id="WSF-Pq-4QN"/>
                                 </connections>
                             </collectionView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VGe-0l-BbX">
+                                <rect key="frame" x="33.5" y="322" width="308" height="24"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="NO PHOTOS FOR THIS LOCATION">
+                                        <attributes>
+                                            <font key="NSFont" size="20" name=".AppleSystemUIFont"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -131,19 +162,31 @@
                             <constraint firstItem="l17-E3-RSw" firstAttribute="top" secondItem="GuP-HU-wNn" secondAttribute="bottom" id="8vQ-f0-lUO"/>
                             <constraint firstItem="GuP-HU-wNn" firstAttribute="top" secondItem="nj3-uu-nbx" secondAttribute="bottom" id="9a7-LR-M1b"/>
                             <constraint firstItem="l17-E3-RSw" firstAttribute="leading" secondItem="0oG-lL-wfH" secondAttribute="leading" id="TyY-fb-Wd8"/>
+                            <constraint firstItem="VGe-0l-BbX" firstAttribute="centerX" secondItem="0oG-lL-wfH" secondAttribute="centerX" id="U7J-mg-R7c"/>
                             <constraint firstItem="UTr-Uh-E7a" firstAttribute="top" secondItem="l17-E3-RSw" secondAttribute="bottom" id="U8n-CQ-WRb"/>
+                            <constraint firstItem="VGe-0l-BbX" firstAttribute="centerY" secondItem="0oG-lL-wfH" secondAttribute="centerY" id="gEV-cP-W64"/>
                             <constraint firstItem="GuP-HU-wNn" firstAttribute="leading" secondItem="0oG-lL-wfH" secondAttribute="leading" id="rzB-xY-3CH"/>
                             <constraint firstAttribute="trailing" secondItem="l17-E3-RSw" secondAttribute="trailing" id="sJK-pn-OTf"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="dAq-iU-UaM">
+                        <barButtonItem key="rightBarButtonItem" systemItem="trash" id="f6k-Zs-lNm">
+                            <connections>
+                                <action selector="deleteSelectedPhotosAction:" destination="Mop-ri-EXP" id="7qh-K0-c0Q"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
-                        <outlet property="collectionView" destination="GuP-HU-wNn" id="NQI-My-8Y6"/>
+                        <outlet property="deletePhotosButton" destination="f6k-Zs-lNm" id="KRR-Pb-hdU"/>
                         <outlet property="flowLayout" destination="r64-Vn-LT3" id="HWC-W0-TuQ"/>
+                        <outlet property="noPhotosLabel" destination="VGe-0l-BbX" id="pI7-0S-sRl"/>
+                        <outlet property="photosCollectionView" destination="GuP-HU-wNn" id="Kns-DA-ewH"/>
+                        <outlet property="reloadPhotosButton" destination="l17-E3-RSw" id="9pm-Ot-GgX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZWf-UE-3TZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1028" y="121.88905547226388"/>
+            <point key="canvasLocation" x="1714" y="123"/>
         </scene>
     </scenes>
 </document>

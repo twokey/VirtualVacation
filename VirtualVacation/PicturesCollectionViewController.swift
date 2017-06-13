@@ -18,9 +18,9 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     // MARK: Properties
     
     var sharedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
-    var backgroundContext = CoreDataStack.sharedInstance.backgroundContext
+//    var backgroundContext = CoreDataStack.sharedInstance.backgroundContext
     var locationCoordinate = CLLocationCoordinate2D()
-    var photosAvailable = 0
+//    var photosAvailable = 0
     
     fileprivate lazy var vacationLocation: VacationLocation = {
         
@@ -48,18 +48,22 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     // MARK: Outlets
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-//    @IBOutlet weak var collectionView: UICollectionView!
-    
+    @IBOutlet weak var photosCollectionView: UICollectionView!
+    @IBOutlet weak var reloadPhotosButton: UIButton!
+    @IBOutlet weak var noPhotosLabel: UILabel!
+    @IBOutlet weak var deletePhotosButton: UIBarButtonItem!
     
     // MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        collectionView = photosCollectionView
         title = "Photosss"
+        self.noPhotosLabel.isHidden = true
+        configureInterface(selectedIndexes.count)
         
         // Set up Collection View Controller
-        
         let space: CGFloat = 3.0
         let itemsRow: CGFloat = 3.0
         let dimension = (view.frame.size.width - ((itemsRow - 1.0) * space)) / itemsRow
@@ -81,28 +85,45 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
         
         if let frc = fetchedResultsCollectionController, frc.sections![0].numberOfObjects == 0 {
         
+            downloadPhotos()
+        }
+    }
 
-            print("NNumber of items: \(frc.sections![0].numberOfObjects)")
 
-
+    func downloadPhotos() {
+        
+        self.reloadPhotosButton.isEnabled = false
+        
         // Download array of links to photos from Flickr
-        CoreDataStack.sharedInstance.performBackgroundBatchOperation() {_ in 
-            FlickrClient.SharedInstance.getRandomPicturesURLListFor(self.locationCoordinate) { photoURLs in
-    
-                self.photosAvailable = photoURLs.count
-    
+        CoreDataStack.sharedInstance.performBackgroundBatchOperation() {_ in
+            FlickrClient.SharedInstance.getRandomPicturesURLListFor(self.locationCoordinate) { (photoURLsDownloaded, error) in
+                
+                guard let photoURLs = photoURLsDownloaded, photoURLs.count > 0  else {
+                    print("No photo URL was downloaded")
+                    DispatchQueue.main.async {
+                        self.noPhotosLabel.isHidden = false
+                        self.reloadPhotosButton.isEnabled = true
+                    }
+                    return
+                }
+                
+                let photosAvailable = photoURLs.count
+                print("Photos available for loading: \(photosAvailable)")
+                let photosDownloadLimit = min(photosAvailable, 20)
+                var photosDownloaded = 0
+                
                 // Download pictures from urls array and populate Core Data table
                 for photoURL in photoURLs {
-    
+                    
                     if let imageData = try? Data(contentsOf: photoURL) {
-                
+                        
                         let image = UIImage(data: imageData)!
-           //         let image = #imageLiteral(resourceName: "Photo-1")
+                        
                         guard let imageJPEGData = UIImageJPEGRepresentation(image, 1.0) else {
                             print("Image conversion to JPEG failed")
                             return
                         }
-    
+                        
                         let thumbnail = image.scale(toSize: self.view.frame.size)
                         guard let thumbnailJPEGData = UIImageJPEGRepresentation(thumbnail, 0.7) else {
                             print("Thumbnail conversion to JPEG failed")
@@ -110,22 +131,26 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
                         }
                         
                         DispatchQueue.main.async {
-    
+                            
                             // Create photo and image objects
                             let imageObject = Image(imageData: imageJPEGData as NSData, context: self.sharedContext)
-                            let photo = Photo(vacationLocation: self.vacationLocation, title: "No title", imageObject: imageObject, thumbnail: thumbnailJPEGData as NSData, latitude: self.locationCoordinate.latitude, longitude: self.locationCoordinate.longitude, context: self.sharedContext)
+                            let _ = Photo(vacationLocation: self.vacationLocation, title: "No title", imageObject: imageObject, thumbnail: thumbnailJPEGData as NSData, latitude: self.locationCoordinate.latitude, longitude: self.locationCoordinate.longitude, context: self.sharedContext)
                             CoreDataStack.sharedInstance.saveContext()
                         }
-//                        objectsSaved += 1
+                    }
+                    photosDownloaded += 1
+                    
+                    if photosDownloaded >= photosDownloadLimit {
+                        break
                     }
                 }
- //               print("Objects saved: \(objectsSaved)")
+                DispatchQueue.main.async {
+                    self.reloadPhotosButton.isEnabled = true
+                }
             }
         }
-                    }
     }
-
-
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PicturesCollectionViewCell
@@ -139,15 +164,57 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
         return cell
     }
     
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let frc = fetchedResultsCollectionController {
-            print("Number of items: \(frc.sections![section].numberOfObjects)")
-            return frc.sections![section].numberOfObjects
-        } else {
-            print("Photos available: \(self.photosAvailable)")
-            return photosAvailable
-
+    func deleteSelectedPhotos() {
+        var photosToDelete = [Photo]()
+        
+        for indexPath in selectedIndexes {
+            photosToDelete.append(fetchedResultsCollectionController?.object(at: indexPath) as! Photo)
         }
+        
+        for photo in photosToDelete {
+            sharedContext.delete(photo)
+        }
+        
+        selectedIndexes = [IndexPath]()
+    }
+    
+    override func configureInterface(_ cellSelected: Int) {
+        switch cellSelected {
+        case 0:
+            deletePhotosButton.isEnabled =  false
+        default:
+            deletePhotosButton.isEnabled = true
+        }
+    }
+
+    
+    // MARK: Actions
+    
+    @IBAction func updateAlbum(_ sender: UIButton) {
+        
+        // Clean table Photo (and Images)
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
+        let coordinatesArray = [self.locationCoordinate.latitude, self.locationCoordinate.longitude]
+        let predicate = NSPredicate(format: "latitude = %@ AND longitude =%@", argumentArray: coordinatesArray)
+        fetchRequest.predicate = predicate
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+
+        do {
+            _ = try sharedContext.execute(deleteRequest)
+        } catch {
+            print("Couldn't clean the Photo entity")
+        }
+        
+        executeSearch()
+        self.collectionView?.reloadData()
+        downloadPhotos()
+
+    }
+    
+    @IBAction func deleteSelectedPhotosAction(_ sender: UIBarButtonItem) {
+        
+        deleteSelectedPhotos()
+        
     }
 }
 

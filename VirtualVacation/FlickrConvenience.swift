@@ -12,7 +12,7 @@ import UIKit
 
 extension FlickrClient {
     
-    func getRandomPicturesURLListFor(_ locationCoordinate: CLLocationCoordinate2D, completionHandler: @escaping (_ photoURLs: [URL]) -> Void) {
+    func getRandomPicturesURLListFor(_ locationCoordinate: CLLocationCoordinate2D, completionHandler: @escaping (_ photoURLs: [URL]?, _ error: NSError?) -> Void) {
         
         let methodParameters = [
             Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
@@ -27,8 +27,8 @@ extension FlickrClient {
             
             func sendError(_ error: String, code: Int) {
                 print(error)
-                //                let userInfo = [NSLocalizedDescriptionKey: error]
-                //                completionHandlerForGET(nil, NSError(domain: "taskForGETMethod", code: code, userInfo: userInfo))
+                let userInfo = [NSLocalizedDescriptionKey: error]
+                completionHandler(nil, NSError(domain: "taskForGETMethod", code: code, userInfo: userInfo))
             }
             
             guard let stat = parsedResult?[Constants.FlickrResponseKeys.Status] as? String, stat == Constants.FlickrResponseValues.OKStatus else {
@@ -56,7 +56,7 @@ extension FlickrClient {
         }
     }
     
-    func getPicturesURLListFor(_ locationCoordinate: CLLocationCoordinate2D, withPageNumber pageNumber: Int, completionHandler: @escaping (_ photoURLs: [URL]) -> Void) {
+    func getPicturesURLListFor(_ locationCoordinate: CLLocationCoordinate2D, withPageNumber pageNumber: Int, completionHandler: @escaping (_ photoURLs: [URL]?, _ error: NSError?) -> Void) {
         let methodParametersWithPageNumber = [
             Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
             Constants.FlickrParameterKeys.BoundingBox: bboxString(locationCoordinate),
@@ -70,8 +70,8 @@ extension FlickrClient {
             
             func sendError(_ error: String, code: Int) {
                 print(error)
-                //                let userInfo = [NSLocalizedDescriptionKey: error]
-                //                completionHandlerForGET(nil, NSError(domain: "taskForGETMethod", code: code, userInfo: userInfo))
+                let userInfo = [NSLocalizedDescriptionKey: error]
+                completionHandler(nil, NSError(domain: "taskForGETMethod", code: code, userInfo: userInfo))
             }
             
             guard let stat = parsedResult?[Constants.FlickrResponseKeys.Status] as? String, stat == Constants.FlickrResponseValues.OKStatus else {
@@ -109,7 +109,7 @@ extension FlickrClient {
                 photosURLList.append(photoURL)
             }
             
-            completionHandler(photosURLList)
+            completionHandler(photosURLList, nil)
         }
     }
     

@@ -24,7 +24,7 @@ struct Constants {
         static let ApiScheme = "https"
         static let ApiHost = "api.flickr.com"
         static let ApiPath = "/services/rest/"
-        static let SearchBBoxHalfSide = 1.0
+        static let SearchBBoxHalfSide = 0.25
         static let SearchLatRange = (-90.0, 90.0)
         static let SearchLonRange = (-180.0, 180.0)
     }

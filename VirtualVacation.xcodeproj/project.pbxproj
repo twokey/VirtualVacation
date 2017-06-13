@@ -121,6 +121,7 @@
 				9C964BEC1EB5931500A0C775 /* MapViewController.swift */,
 				9C54A4AE1EE4BC30006B6CD8 /* PicturesCollectionViewController.swift */,
 				9C54A4B01EE4BC6E006B6CD8 /* PicturesCollectionViewCell.swift */,
+				9C20C6B31EE8F62B009E318A /* CoreDataCollectionViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -133,7 +134,6 @@
 				9CF15AD11EE1286500907176 /* FlickrConvenience.swift */,
 				9CED2EF41EDFB27100851DD1 /* FlickrClient.swift */,
 				9C9C64F11EDE59A7000368A0 /* CoreDataStack.swift */,
-				9C20C6B31EE8F62B009E318A /* CoreDataCollectionViewController.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";

@@ -69,15 +69,15 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         mapView.setRegion(mapViewRegion, animated: true)
 //        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
         
-        // Clean table Photo (and Images)
-        let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
-        let request = NSBatchDeleteRequest(fetchRequest: fetch)
-        do {
-            _ = try sharedContext.execute(request)
-            print("Photos have been cleaned successfuly")
-        } catch {
-            print("Couldn't clean the Photo entity")
-        }
+//        // Clean table Photo (and Images)
+//        let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
+//        let request = NSBatchDeleteRequest(fetchRequest: fetch)
+//        do {
+//            _ = try sharedContext.execute(request)
+//            print("Photos have been cleaned successfuly")
+//        } catch {
+//            print("Couldn't clean the Photo entity")
+//        }
         
 //        // Start the Fetched Results Controller
 //        do {
@@ -200,7 +200,7 @@ extension MapViewController: MKMapViewDelegate {
                                        "longitude_delta" : mapView.region.span.longitudeDelta]
         
         UserDefaults.standard.set(mapViewRegionDictionary, forKey: "mapViewRegion")
-        print("User Defaults updated with new region \n \(mapViewRegionDictionary)")
+//        print("User Defaults updated with new region \n\(mapViewRegionDictionary)")
         
     }
 }
