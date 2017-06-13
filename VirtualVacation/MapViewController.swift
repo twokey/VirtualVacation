@@ -67,9 +67,9 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         // Configure mapView
         mapView.delegate = self
         mapView.setRegion(mapViewRegion, animated: true)
-//        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
+        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
         
-//        // Clean table Photo (and Images)
+        // Clean table Photo (and Images)
 //        let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
 //        let request = NSBatchDeleteRequest(fetchRequest: fetch)
 //        do {
