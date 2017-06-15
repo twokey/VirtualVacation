@@ -60,7 +60,6 @@ class CoreDataCollectionViewController: UIViewController, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let frc = fetchedResultsCollectionController {
-            //print("Number of items: \(frc.sections![section].numberOfObjects)")
             return frc.sections![section].numberOfObjects
         } else {
             return 0
@@ -146,8 +145,8 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
     // We store the index paths into the three arrays.
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
         switch type {
-            
         case .insert:
             // Here we are noting that a new instance has been added to Core Data. We remember its index path
             // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
@@ -180,8 +179,6 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
     // The most interesting thing about the method is the collection view's "performBatchUpdates" method.
     // Notice that all of the changes are performed inside a closure that is handed to the collection view.
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        
-        print("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
         
         updateCollectionView()
         

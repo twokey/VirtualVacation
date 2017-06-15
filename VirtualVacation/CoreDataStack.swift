@@ -112,6 +112,7 @@ extension CoreDataStack {
             // can work
             do {
                 try self.backgroundContext.save()
+                print("background context saved")
             } catch {
                 fatalError("Error while saving backgroundContext: \(error)")
             }

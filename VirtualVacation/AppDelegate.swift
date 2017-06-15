@@ -15,11 +15,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func checkIfFirstLaunch() {
-        if UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
-            print("App has launched before")
-        } else {
-            print("This is the first launch ever!")
+        if !UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
+            
+            // Set the key for the first launch
             UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+            
+            // Set initial location for the first lounch at above the USA
             let mapViewRegionDictionary: [String : Double] = ["center_latitude" : 38.810508454750078,
                                        "center_longitude" : -98.632882194281535,
                                        "latitude_delta" : 79.009668524180711,
@@ -39,6 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+
         UserDefaults.standard.synchronize()
         CoreDataStack.sharedInstance.saveContext()
     }
@@ -46,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
         UserDefaults.standard.synchronize()
         CoreDataStack.sharedInstance.saveContext()
     }
@@ -61,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
+
         UserDefaults.standard.synchronize()
         CoreDataStack.sharedInstance.saveContext()
     }

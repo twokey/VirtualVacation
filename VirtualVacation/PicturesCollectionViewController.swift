@@ -18,9 +18,9 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     // MARK: Properties
     
     var sharedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
-//    var backgroundContext = CoreDataStack.sharedInstance.backgroundContext
     var locationCoordinate = CLLocationCoordinate2D()
-//    var photosAvailable = 0
+
+    var photos = [Photo]()
     
     fileprivate lazy var vacationLocation: VacationLocation = {
         
@@ -58,9 +58,11 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // Set up UI
         collectionView = photosCollectionView
         title = "Photosss"
         self.noPhotosLabel.isHidden = true
+        self.reloadPhotosButton.isEnabled = false
         configureInterface(selectedIndexes.count)
         
         // Set up Collection View Controller
@@ -79,87 +81,77 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
         fetchRequest.predicate = predicate
         fetchRequest.sortDescriptors = []
         
+        do {
+            self.photos = try sharedContext.fetch(fetchRequest) as! [Photo]
+        } catch let e as NSError{
+            print("Can't execure fetch request \n\(e)")
+        }
+        
         // Configure Fetched Results Controller
         fetchedResultsCollectionController = NSFetchedResultsController(fetchRequest: fetchRequest , managedObjectContext: sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsCollectionController?.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        if let frc = fetchedResultsCollectionController, frc.sections![0].numberOfObjects == 0 {
-        
-            downloadPhotos()
+        if photos.count > 0 {
+            downloadPhotos(photos)
+        } else {
+            print("There is no photo!")
+            self.reloadPhotosButton.isEnabled = true
         }
+
     }
 
 
-    func downloadPhotos() {
+    func downloadPhotos(_ photos: [Photo]) {
         
         self.reloadPhotosButton.isEnabled = false
         
-        // Download array of links to photos from Flickr
-        CoreDataStack.sharedInstance.performBackgroundBatchOperation() {_ in
-            FlickrClient.SharedInstance.getRandomPicturesURLListFor(self.locationCoordinate) { (photoURLsDownloaded, error) in
-                
-                guard let photoURLs = photoURLsDownloaded, photoURLs.count > 0  else {
-                    print("No photo URL was downloaded")
-                    DispatchQueue.main.async {
-                        self.noPhotosLabel.isHidden = false
-                        self.reloadPhotosButton.isEnabled = true
-                    }
-                    return
-                }
-                
-                let photosAvailable = photoURLs.count
-                print("Photos available for loading: \(photosAvailable)")
-                let photosDownloadLimit = min(photosAvailable, 20)
-                var photosDownloaded = 0
-                
+        for photo in photos {
+        
+            if photo.thumbnail == nil {
+                let photoURL = URL(string: photo.photoLink)!
                 // Download pictures from urls array and populate Core Data table
-                for photoURL in photoURLs {
-                    
-                    if let imageData = try? Data(contentsOf: photoURL) {
-                        
-                        let image = UIImage(data: imageData)!
-                        
-                        guard let imageJPEGData = UIImageJPEGRepresentation(image, 1.0) else {
-                            print("Image conversion to JPEG failed")
-                            return
-                        }
-                        
-                        let thumbnail = image.scale(toSize: self.view.frame.size)
-                        guard let thumbnailJPEGData = UIImageJPEGRepresentation(thumbnail, 0.7) else {
-                            print("Thumbnail conversion to JPEG failed")
-                            return
-                        }
-                        
-                        DispatchQueue.main.async {
-                            
-                            // Create photo and image objects
-                            let imageObject = Image(imageData: imageJPEGData as NSData, context: self.sharedContext)
-                            let _ = Photo(vacationLocation: self.vacationLocation, title: "No title", imageObject: imageObject, thumbnail: thumbnailJPEGData as NSData, latitude: self.locationCoordinate.latitude, longitude: self.locationCoordinate.longitude, context: self.sharedContext)
-                            CoreDataStack.sharedInstance.saveContext()
-                        }
+
+                if let imageData = try? Data(contentsOf: photoURL) {
+                
+                    let image = UIImage(data: imageData)!
+                    guard let imageJPEGData = UIImageJPEGRepresentation(image, 1.0) else {
+                        print("Image conversion to JPEG failed")
+                        return
                     }
-                    photosDownloaded += 1
-                    
-                    if photosDownloaded >= photosDownloadLimit {
-                        break
+
+                    let thumbnail = image.scale(toSize: self.view.frame.size)
+                    guard let thumbnailJPEGData = UIImageJPEGRepresentation(thumbnail, 0.7) else {
+                        print("Thumbnail conversion to JPEG failed")
+                        return
                     }
+                    // Update photo and image objects
+                    photo.thumbnail = thumbnailJPEGData as NSData
                 }
-                DispatchQueue.main.async {
-                    self.reloadPhotosButton.isEnabled = true
-                }
+
+                CoreDataStack.sharedInstance.saveContext()
             }
+
         }
+        
+        self.reloadPhotosButton.isEnabled = true
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PicturesCollectionViewCell
         
-            let photo = fetchedResultsCollectionController?.object(at: indexPath) as! Photo
-            let cellImage = UIImage(data: (photo.thumbnail as Data?)!)
+        let photo = fetchedResultsCollectionController?.object(at: indexPath) as! Photo
         
+        if let data = photo.thumbnail as Data? {
+            let cellImage = UIImage(data: data)
             // Configure cell
             cell.cellImageView?.image = cellImage
+            cell.activityIndicator.stopAnimating()
+        }
         
         return cell
     }
@@ -204,16 +196,71 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
         } catch {
             print("Couldn't clean the Photo entity")
         }
-        
-        executeSearch()
-        self.collectionView?.reloadData()
-        downloadPhotos()
 
+        updatePhotoAlbumFor()
+        
     }
+    
+    func updatePhotoAlbumFor() {
+        
+        let locationCoordinate = CLLocationCoordinate2D(latitude: vacationLocation.latitude, longitude: vacationLocation.longitude)
+        
+        FlickrClient.SharedInstance.getRandomPicturesURLListFor(locationCoordinate) { (photoURLsDownloaded, error) in
+            
+            guard let photoURLs = photoURLsDownloaded, photoURLs.count > 0  else {
+                print("No photo URL was downloaded")
+                return
+            }
+            
+            let photosAvailable = photoURLs.count
+            let maximumPhotos = 30
+            
+            // Set limit for the number of photos for loading
+            let photosDownloadLimit = min(photosAvailable, maximumPhotos)
+            var photosDownloaded = 0
+            
+            // Download pictures from urls array and populate Core Data table
+            for photoURL in photoURLs {
+                
+                // Create photo and image objects
+                let imageObject = Image(imageData: nil, context: self.sharedContext)
+                let _ = Photo(vacationLocation: self.vacationLocation, title: "No title", photoLink: photoURL.absoluteString, imageObject: imageObject, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
+                
+                photosDownloaded += 1
+                
+                if photosDownloaded >= photosDownloadLimit {
+                    break
+                }
+            }
+            
+            CoreDataStack.sharedInstance.saveContext()
+            
+            DispatchQueue.main.async {
+                
+                // Create and configure fetch request
+                let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
+                let coordinatesArray = [self.locationCoordinate.latitude, self.locationCoordinate.longitude]
+                let predicate = NSPredicate(format: "latitude = %@ AND longitude =%@", argumentArray: coordinatesArray)
+                fetchRequest.predicate = predicate
+                fetchRequest.sortDescriptors = []
+                
+                do {
+                    self.photos = try self.sharedContext.fetch(fetchRequest) as! [Photo]
+                } catch let e as NSError{
+                    print("Can't execure fetch request \n\(e)")
+                }
+
+                self.downloadPhotos(self.photos)
+                
+            }
+        }
+    }
+
     
     @IBAction func deleteSelectedPhotosAction(_ sender: UIBarButtonItem) {
         
         deleteSelectedPhotos()
+        self.collectionView?.reloadData()
         
     }
 }
@@ -249,4 +296,3 @@ extension UIImage {
     }
     
 }
-

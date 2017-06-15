@@ -20,6 +20,7 @@ extension Photo {
     @NSManaged public var id: Int32
     @NSManaged public var thumbnail: NSData?
     @NSManaged public var title: String?
+    @NSManaged public var photoLink: String
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
     @NSManaged public var vacationLocationId: Int32

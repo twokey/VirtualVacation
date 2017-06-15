@@ -67,24 +67,6 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         // Configure mapView
         mapView.delegate = self
         mapView.setRegion(mapViewRegion, animated: true)
-        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
-        
-        // Clean table Photo (and Images)
-//        let fetch: NSFetchRequest<NSFetchRequestResult> = Photo.fetchRequest()
-//        let request = NSBatchDeleteRequest(fetchRequest: fetch)
-//        do {
-//            _ = try sharedContext.execute(request)
-//            print("Photos have been cleaned successfuly")
-//        } catch {
-//            print("Couldn't clean the Photo entity")
-//        }
-        
-//        // Start the Fetched Results Controller
-//        do {
-//            try fetchedResultsController.performFetch()
-//        } catch let error as NSError {
-//            print("Error performing initial fetch: \(error)")
-//        }
         
         for location in fetchedResultsController.fetchedObjects! {
             let annotation = MKPointAnnotation()
@@ -102,7 +84,7 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     @IBAction func longPressMapViewAction(_ gestureRecognizer: UILongPressGestureRecognizer) {
         
-        // If user long press on map view...
+        // If user tap long on the map view...
         if gestureRecognizer.state == .began {
             
             // convert touch location to the mapView coordinate
@@ -113,36 +95,19 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
             let annotation = MKPointAnnotation()
             annotation.coordinate = touchCoordinate
             
-            // find description of the point and add the information to annotation
-            CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: touchCoordinate.latitude, longitude: touchCoordinate.longitude)) { placemarks, error in
-                guard (error == nil) else {
-                    print("Revese geocoding failed with error" + error!.localizedDescription)
-                    return
-                }
-                
-                guard let placemarks = placemarks, placemarks.count > 0 else {
-                    print("No location was returned")
-                    annotation.title = "Unknown Place"
-                    self.addVacationLocation(annotation)
-                    return
-                }
-                
-                let placemark = placemarks[0]
-                annotation.title = placemark.country ?? "Unknown country"
-                annotation.subtitle = placemark.locality ?? "Unknown city"
-                
-                self.addVacationLocation(annotation)
-            }
+            // Add annotation to the mapView
+            self.mapView.addAnnotation(annotation)
+            
+            // Add description of the annotation
+            updateAnnotationDetails(annotation)
+            
         }
     }
     
     
-    // Add annotation to mapView and save location to Core Data
+    // Create entity for the location and and save the location to Core Data
     func addVacationLocation(_ annotation: MKPointAnnotation) {
         
-        DispatchQueue.main.async {
-            self.mapView.addAnnotation(annotation)
-                        
             // Create and configure vacationLocation
             let vacationLocation = VacationLocation(context: self.sharedContext)
             vacationLocation.title = annotation.title
@@ -151,7 +116,74 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
             vacationLocation.longitude = annotation.coordinate.longitude
             vacationLocation.creationDate = Date() as NSDate
             vacationLocation.id = Int32(Date().timeIntervalSince1970)
+
+            CoreDataStack.sharedInstance.saveContext()
+        
+        createPhotoAlbumFor(vacationLocation)
+    }
+    
+    // Download geo information for a pin and populate the pin with the information
+    
+    func updateAnnotationDetails(_ annotation: MKPointAnnotation) {
+        
+        // Download geo information
+        CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude)) { placemarks, error in
+            guard (error == nil) else {
+                print("Revese geocoding failed with error" + error!.localizedDescription)
+                return
+            }
             
+            guard let placemarks = placemarks, placemarks.count > 0 else {
+                print("No location was returned")
+                annotation.title = "Unknown Place"
+                self.addVacationLocation(annotation)
+                return
+            }
+            
+            let placemark = placemarks[0]
+            annotation.title = placemark.locality ?? "Unknown city"
+            annotation.subtitle = placemark.country ?? "Unknown country"
+            
+            // Save location to Core Data
+            self.addVacationLocation(annotation)
+        }
+    }
+    
+    
+    // Download information about Photos at specific location and save it
+    
+    func createPhotoAlbumFor(_ vacationLocation: VacationLocation) {
+        
+        let locationCoordinate = CLLocationCoordinate2D(latitude: vacationLocation.latitude, longitude: vacationLocation.longitude)
+        
+        FlickrClient.SharedInstance.getRandomPicturesURLListFor(locationCoordinate) { (photoURLsDownloaded, error) in
+            
+            guard let photoURLs = photoURLsDownloaded, photoURLs.count > 0  else {
+                print("No photo URL was downloaded")
+                return
+            }
+            
+            let photosAvailable = photoURLs.count
+            let maximumPhotos = 30
+            
+            // Set limit for the number of photos for loading
+            let photosDownloadLimit = min(photosAvailable, maximumPhotos)
+            var photosDownloaded = 0
+            
+            // Download pictures from urls array and populate Core Data table
+            for photoURL in photoURLs {
+                
+                // Create photo and image objects
+                let imageObject = Image(imageData: nil, context: self.sharedContext)
+                let _ = Photo(vacationLocation: vacationLocation, title: "No title", photoLink: photoURL.absoluteString, imageObject: imageObject, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
+
+                photosDownloaded += 1
+                
+                if photosDownloaded >= photosDownloadLimit {
+                    break
+                }
+            }
+                
             CoreDataStack.sharedInstance.saveContext()
         }
     }
@@ -161,6 +193,8 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
 // MARK: - MapView Delegate
 
 extension MapViewController: MKMapViewDelegate {
+    
+    // Implement if an annotation view was tapped
     
     func mapView(_ mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped: UIControl) {
         
@@ -173,6 +207,8 @@ extension MapViewController: MKMapViewDelegate {
         
         self.navigationController?.pushViewController(albumCollectionViewController, animated: true)        
     }
+    
+    // Create annotation view for a pin on the map
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let identifier = "pin"
@@ -192,6 +228,8 @@ extension MapViewController: MKMapViewDelegate {
         return view
     }
     
+    // Save new region into defaults if the map was moved/zoomed
+    
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
         mapViewRegionDictionary = ["center_latitude" : mapView.region.center.latitude,
@@ -200,7 +238,6 @@ extension MapViewController: MKMapViewDelegate {
                                        "longitude_delta" : mapView.region.span.longitudeDelta]
         
         UserDefaults.standard.set(mapViewRegionDictionary, forKey: "mapViewRegion")
-//        print("User Defaults updated with new region \n\(mapViewRegionDictionary)")
         
     }
 }
