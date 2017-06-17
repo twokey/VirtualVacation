@@ -65,6 +65,7 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         super.viewDidLoad()
         
         // Configure mapView
+        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
         mapView.delegate = self
         mapView.setRegion(mapViewRegion, animated: true)
         
@@ -163,28 +164,18 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
                 return
             }
             
-            let photosAvailable = photoURLs.count
-            let maximumPhotos = 30
-            
-            // Set limit for the number of photos for loading
-            let photosDownloadLimit = min(photosAvailable, maximumPhotos)
-            var photosDownloaded = 0
-            
-            // Download pictures from urls array and populate Core Data table
-            for photoURL in photoURLs {
-                
-                // Create photo and image objects
-                let imageObject = Image(imageData: nil, context: self.sharedContext)
-                let _ = Photo(vacationLocation: vacationLocation, title: "No title", photoLink: photoURL.absoluteString, imageObject: imageObject, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
+            DispatchQueue.main.async {
+                // Download pictures from urls array and populate Core Data table
+                for photoURL in photoURLs {
+                    
+                    // Create photo and image objects
+                    let imageObject = Image(imageData: nil, context: self.sharedContext)
+                    let _ = Photo(vacationLocation: vacationLocation, title: "No title", photoLink: photoURL.absoluteString, imageObject: imageObject, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
 
-                photosDownloaded += 1
-                
-                if photosDownloaded >= photosDownloadLimit {
-                    break
                 }
+            
+                CoreDataStack.sharedInstance.saveContext()
             }
-                
-            CoreDataStack.sharedInstance.saveContext()
         }
     }
 }

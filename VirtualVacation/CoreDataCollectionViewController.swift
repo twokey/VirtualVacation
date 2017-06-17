@@ -87,23 +87,33 @@ class CoreDataCollectionViewController: UIViewController, UICollectionViewDataSo
         // Then reconfigure the cell
         configureCell(cell, atIndexPath: indexPath)
         
-        // Configure interface
-        configureInterface(selectedIndexes.count)
+//        // Configure interface
+//        configureInterface(selectedIndexes.count)
         
     }
     
     
     // MARK: Helpers
     
+//    func executeSearch() {
+//        if let frc = fetchedResultsCollectionController {
+//            do {
+//                try frc.performFetch()
+//            } catch let e as NSError {
+//                print("Error while trying to perform a search: \n\(e)")
+//            }
+//        }
+//    }
+    
     func executeSearch() {
-        if let frc = fetchedResultsCollectionController {
+
             do {
-                try frc.performFetch()
+                try fetchedResultsCollectionController?.performFetch()
             } catch let e as NSError {
                 print("Error while trying to perform a search: \n\(e)")
             }
-        }
     }
+
     
     private func configureCell(_ cell: PicturesCollectionViewCell, atIndexPath indexPath: IndexPath) {
         
@@ -117,12 +127,6 @@ class CoreDataCollectionViewController: UIViewController, UICollectionViewDataSo
         }
     }
     
-    
-    // Subclass will implement if neccessary
-    func configureInterface(_ cellSelected: Int) {
-        
-    }
-    
 }
 
 
@@ -134,7 +138,7 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
     // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
     // three fresh arrays to record the index paths that will be changed.
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        
+        print("Controller will change content")
         // We are about to handle some new changes. Start out with empty arrays for each change type
         insertedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
@@ -160,6 +164,7 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
             deletedIndexPaths.append(indexPath!)
             break
         case .update:
+            print("updating")
             // We don't expect Color instances to change after they are created. But Core Data would
             // notify us of changes if any occured. This can be useful if you want to respond to changes
             // that come about after data is downloaded. For example, when an image is downloaded from
@@ -196,6 +201,7 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
             }
             
             for indexPath in self.updatedIndexPaths {
+                print("reload items")
                 self.collectionView?.reloadItems(at: [indexPath])
             }
             

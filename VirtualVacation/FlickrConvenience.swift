@@ -19,7 +19,8 @@ extension FlickrClient {
             Constants.FlickrParameterKeys.BoundingBox: bboxString(locationCoordinate),
             Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
             Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback
+            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
+            Constants.FlickrParameterKeys.PerPage: Constants.FlickrParameterValues.ResultsPerPage
             ] as [String:AnyObject]
 
         var picturesURLList = [URL]()
@@ -63,7 +64,8 @@ extension FlickrClient {
             Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
             Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
             Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
-            Constants.FlickrParameterKeys.Page: pageNumber
+            Constants.FlickrParameterKeys.Page: pageNumber,
+            Constants.FlickrParameterKeys.PerPage: Constants.FlickrParameterValues.ResultsPerPage
             ] as [String:AnyObject]
         
         let _ = taskForGETMethod(methodParametersWithPageNumber) { (parsedResult, error) in
