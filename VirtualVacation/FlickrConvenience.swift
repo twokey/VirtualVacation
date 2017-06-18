@@ -115,6 +115,26 @@ extension FlickrClient {
         }
     }
     
+    func getPicturesFor(_ indexPath: IndexPath, photo: Photo, handler: @escaping (_ data: Data?, _ image: UIImage?, _ error: Error?) -> Void) {
+        
+        let url = URL(string: photo.photoLink)
+        let request = URLRequest(url: url!)
+        let task = session.dataTask(with: request) { (data, response, error) in
+            DispatchQueue.main.async(execute: {
+                guard let data = data else {
+                    print("Data for photo is not loaded")
+                    return handler(nil, nil, error)
+                }
+                guard let image = UIImage(data: data) else {
+                    print("Data cannot be converter into image")
+                    return handler(nil, nil, error)
+                }
+                return handler(data, image, nil)
+            })
+        }
+        task.resume()
+    }
+    
     private func bboxString(_ locationCoordinate: CLLocationCoordinate2D) -> String {
         // ensure bbox is bounded by minimum and maximums
         let minimumLon = max(locationCoordinate.longitude - Constants.FlickrAPIValues.SearchBBoxHalfSide, Constants.FlickrAPIValues.SearchLonRange.0)

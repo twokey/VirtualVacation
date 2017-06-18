@@ -169,8 +169,8 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
                 for photoURL in photoURLs {
                     
                     // Create photo and image objects
-                    let imageObject = Image(imageData: nil, context: self.sharedContext)
-                    let _ = Photo(vacationLocation: vacationLocation, title: "No title", photoLink: photoURL.absoluteString, imageObject: imageObject, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
+       //             let imageObject = Image(imageData: nil, context: self.sharedContext)
+                    let _ = Photo(vacationLocation: vacationLocation, title: "No title", photoLink: photoURL.absoluteString, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
 
                 }
             

@@ -24,7 +24,6 @@ extension Photo {
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
     @NSManaged public var vacationLocationId: Int32
-    @NSManaged public var image: Image?
     @NSManaged public var vacationLocation: VacationLocation?
 
 }

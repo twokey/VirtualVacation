@@ -18,7 +18,7 @@ public class Photo: NSManagedObject {
 //        }
 //    }
     
-    convenience init(vacationLocation: VacationLocation, title: String = "photoName", photoLink: String, imageObject: Image, thumbnail: NSData?, latitude: Double, longitude: Double, context: NSManagedObjectContext ) {
+    convenience init(vacationLocation: VacationLocation, title: String = "photoName", photoLink: String, thumbnail: NSData?, latitude: Double, longitude: Double, context: NSManagedObjectContext ) {
         
         //         An EntityDescription is an object that has access to all
         //         the information you provided in the Entity part of the model
@@ -30,7 +30,6 @@ public class Photo: NSManagedObject {
                 self.vacationLocation = vacationLocation
                 self.title = title
                 self.photoLink = photoLink
-                self.image = imageObject
                 self.thumbnail = thumbnail
                 self.creationDate = Date() as NSDate
                 self.id = Int32(Date().timeIntervalSince1970)

@@ -14,8 +14,6 @@
 		9C5EA8EF1EB599B000EE3DC0 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5EA8EB1EB599B000EE3DC0 /* Photo+CoreDataProperties.swift */; };
 		9C5EA8F01EB599B000EE3DC0 /* VacationLocation+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5EA8EC1EB599B000EE3DC0 /* VacationLocation+CoreDataClass.swift */; };
 		9C5EA8F11EB599B000EE3DC0 /* VacationLocation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5EA8ED1EB599B000EE3DC0 /* VacationLocation+CoreDataProperties.swift */; };
-		9C5EA8F61EB5BF9800EE3DC0 /* Image+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5EA8F21EB5BF9800EE3DC0 /* Image+CoreDataClass.swift */; };
-		9C5EA8F71EB5BF9800EE3DC0 /* Image+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5EA8F31EB5BF9800EE3DC0 /* Image+CoreDataProperties.swift */; };
 		9C964BEB1EB5931500A0C775 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C964BEA1EB5931500A0C775 /* AppDelegate.swift */; };
 		9C964BED1EB5931500A0C775 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C964BEC1EB5931500A0C775 /* MapViewController.swift */; };
 		9C964BF01EB5931500A0C775 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C964BEE1EB5931500A0C775 /* Main.storyboard */; };
@@ -36,8 +34,6 @@
 		9C5EA8EB1EB599B000EE3DC0 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Photo+CoreDataProperties.swift"; path = "../Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		9C5EA8EC1EB599B000EE3DC0 /* VacationLocation+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "VacationLocation+CoreDataClass.swift"; path = "../VacationLocation+CoreDataClass.swift"; sourceTree = "<group>"; };
 		9C5EA8ED1EB599B000EE3DC0 /* VacationLocation+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "VacationLocation+CoreDataProperties.swift"; path = "../VacationLocation+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		9C5EA8F21EB5BF9800EE3DC0 /* Image+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Image+CoreDataClass.swift"; path = "../Image+CoreDataClass.swift"; sourceTree = "<group>"; };
-		9C5EA8F31EB5BF9800EE3DC0 /* Image+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Image+CoreDataProperties.swift"; path = "../Image+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		9C964BE71EB5931500A0C775 /* VirtualVacation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualVacation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C964BEA1EB5931500A0C775 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9C964BEC1EB5931500A0C775 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
@@ -69,8 +65,6 @@
 				9C964BF11EB5931500A0C775 /* VirtualVacation.xcdatamodeld */,
 				9C5EA8EA1EB599B000EE3DC0 /* Photo+CoreDataClass.swift */,
 				9C5EA8EB1EB599B000EE3DC0 /* Photo+CoreDataProperties.swift */,
-				9C5EA8F21EB5BF9800EE3DC0 /* Image+CoreDataClass.swift */,
-				9C5EA8F31EB5BF9800EE3DC0 /* Image+CoreDataProperties.swift */,
 				9C5EA8EC1EB599B000EE3DC0 /* VacationLocation+CoreDataClass.swift */,
 				9C5EA8ED1EB599B000EE3DC0 /* VacationLocation+CoreDataProperties.swift */,
 			);
@@ -213,11 +207,9 @@
 			files = (
 				9CF15AD21EE1286500907176 /* FlickrConvenience.swift in Sources */,
 				9C54A4B11EE4BC6E006B6CD8 /* PicturesCollectionViewCell.swift in Sources */,
-				9C5EA8F71EB5BF9800EE3DC0 /* Image+CoreDataProperties.swift in Sources */,
 				9C964BED1EB5931500A0C775 /* MapViewController.swift in Sources */,
 				9C964BEB1EB5931500A0C775 /* AppDelegate.swift in Sources */,
 				9C5EA8EE1EB599B000EE3DC0 /* Photo+CoreDataClass.swift in Sources */,
-				9C5EA8F61EB5BF9800EE3DC0 /* Image+CoreDataClass.swift in Sources */,
 				9C9C64F21EDE59A7000368A0 /* CoreDataStack.swift in Sources */,
 				9CED2EF71EDFB76500851DD1 /* Constants.swift in Sources */,
 				9C5EA8F01EB599B000EE3DC0 /* VacationLocation+CoreDataClass.swift in Sources */,
