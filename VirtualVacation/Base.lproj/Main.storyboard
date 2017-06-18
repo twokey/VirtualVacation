@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="cHF-Bn-OYa">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="FkP-8p-ax5">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -10,20 +10,20 @@
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
-        <scene sceneID="KZA-hC-eCz">
+        <scene sceneID="HlA-Ww-bnb">
             <objects>
-                <navigationController id="cHF-Bn-OYa" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="eIz-80-8Ec">
+                <navigationController id="FkP-8p-ax5" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="ptZ-3W-hfo">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="pOz-kj-2r2"/>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="wAS-vX-1Xp"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="P7m-xV-hkj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vVv-ur-TyQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-860" y="123"/>
+            <point key="canvasLocation" x="-580" y="123"/>
         </scene>
         <!--Map View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -65,23 +65,7 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="87" y="123"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="yv3-CO-qDD">
-            <objects>
-                <navigationController id="ybU-QP-cxl" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="VTX-Cr-ZyP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="Mop-ri-EXP" kind="relationship" relationship="rootViewController" id="5QW-2p-OjF"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="583-DW-i4f" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="962" y="123"/>
+            <point key="canvasLocation" x="314" y="123"/>
         </scene>
         <!--Pictures Collection View Controller-->
         <scene sceneID="h7d-R3-94I">
@@ -106,7 +90,7 @@
                                 </connections>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GuP-HU-wNn">
-                                <rect key="frame" x="0.0" y="64" width="375" height="573"/>
+                                <rect key="frame" x="0.0" y="20" width="375" height="617"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="r64-Vn-LT3">
                                     <size key="itemSize" width="119" height="119"/>
@@ -174,15 +158,8 @@
                             <constraint firstAttribute="trailing" secondItem="l17-E3-RSw" secondAttribute="trailing" id="sJK-pn-OTf"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="dAq-iU-UaM">
-                        <barButtonItem key="rightBarButtonItem" systemItem="trash" id="f6k-Zs-lNm">
-                            <connections>
-                                <action selector="deleteSelectedPhotosAction:" destination="Mop-ri-EXP" id="7qh-K0-c0Q"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="dAq-iU-UaM"/>
                     <connections>
-                        <outlet property="deletePhotosButton" destination="f6k-Zs-lNm" id="KRR-Pb-hdU"/>
                         <outlet property="flowLayout" destination="r64-Vn-LT3" id="HWC-W0-TuQ"/>
                         <outlet property="noPhotosLabel" destination="VGe-0l-BbX" id="pI7-0S-sRl"/>
                         <outlet property="photosCollectionView" destination="GuP-HU-wNn" id="Kns-DA-ewH"/>
@@ -191,7 +168,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZWf-UE-3TZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1714" y="123"/>
+            <point key="canvasLocation" x="1114" y="123"/>
         </scene>
     </scenes>
 </document>

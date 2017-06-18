@@ -52,7 +52,6 @@ extension FlickrClient {
             // pick a random page!
             let pageLimit = min(totalPages, 40)
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
-            print("Number of pages in Flickr result: \(pageLimit)")
             self.getPicturesURLListFor(locationCoordinate, withPageNumber: randomPage, completionHandler: completionHandler)
         }
     }
@@ -115,7 +114,7 @@ extension FlickrClient {
         }
     }
     
-    func getPicturesFor(_ indexPath: IndexPath, photo: Photo, handler: @escaping (_ data: Data?, _ image: UIImage?, _ error: Error?) -> Void) {
+    func getPicturesFor(photo: Photo, handler: @escaping (_ data: Data?, _ image: UIImage?, _ error: Error?) -> Void) {
         
         let url = URL(string: photo.photoLink)
         let request = URLRequest(url: url!)

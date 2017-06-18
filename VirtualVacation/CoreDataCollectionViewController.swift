@@ -72,61 +72,19 @@ class CoreDataCollectionViewController: UIViewController, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         fatalError("This method MUST be implemented by a subclass of CoreDataCollectionViewController")
     }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
-        let cell = collectionView.cellForItem(at: indexPath) as! PicturesCollectionViewCell
-        
-        // Whenever a cell is tapped we will toggle its presence in the selectedIndexes array
-        if let index = selectedIndexes.index(of: indexPath) {
-            selectedIndexes.remove(at: index)
-        } else {
-            selectedIndexes.append(indexPath)
-        }
-        
-        // Then reconfigure the cell
-        configureCell(cell, atIndexPath: indexPath)
-        
-//        // Configure interface
-//        configureInterface(selectedIndexes.count)
-        
-    }
-    
     
     // MARK: Helpers
     
-//    func executeSearch() {
-//        if let frc = fetchedResultsCollectionController {
-//            do {
-//                try frc.performFetch()
-//            } catch let e as NSError {
-//                print("Error while trying to perform a search: \n\(e)")
-//            }
-//        }
-//    }
-    
     func executeSearch() {
-
+        if let frc = fetchedResultsCollectionController {
             do {
-                try fetchedResultsCollectionController?.performFetch()
+                try frc.performFetch()
             } catch let e as NSError {
                 print("Error while trying to perform a search: \n\(e)")
             }
-    }
-
-    
-    private func configureCell(_ cell: PicturesCollectionViewCell, atIndexPath indexPath: IndexPath) {
-        
-        // If the cell is "selected", its color panel is grayed out
-        // we use the Swift `find` function to see if the indexPath is in the array
-        
-        if let _ = selectedIndexes.index(of: indexPath) {
-            cell.cellImageView?.alpha = 0.05
-        } else {
-            cell.cellImageView?.alpha = 1.0
         }
-    }
-    
+    }    
 }
 
 
@@ -138,7 +96,6 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
     // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
     // three fresh arrays to record the index paths that will be changed.
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("Controller will change content")
         // We are about to handle some new changes. Start out with empty arrays for each change type
         insertedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
@@ -164,7 +121,6 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
             deletedIndexPaths.append(indexPath!)
             break
         case .update:
-            print("updating")
             // We don't expect Color instances to change after they are created. But Core Data would
             // notify us of changes if any occured. This can be useful if you want to respond to changes
             // that come about after data is downloaded. For example, when an image is downloaded from
@@ -201,7 +157,6 @@ extension CoreDataCollectionViewController: NSFetchedResultsControllerDelegate {
             }
             
             for indexPath in self.updatedIndexPaths {
-                print("reload items")
                 self.collectionView?.reloadItems(at: [indexPath])
             }
             

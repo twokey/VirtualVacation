@@ -16,18 +16,7 @@ class CoreDataStack {
 
     static let sharedInstance = CoreDataStack()
 
-    
-    // MARK: Background Context
-    
-//    lazy var backgroundContext: NSManagedObjectContext = {
-//        
-//        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        backgroundContext.parent = self.persistentContainer.viewContext
-//        
-//        return backgroundContext
-//    }()
-//    
-    
+
     // MARK: The Core Data stack. The code has been moved, unaltered, from AppDelegate
     
     lazy var persistentContainer: NSPersistentContainer = {
@@ -94,29 +83,3 @@ class CoreDataStack {
         }
     }
 }
-
-
-// MARK: - CoreDataStack (Batch Processing in the Background)
-
-//extension CoreDataStack {
-//    
-//    typealias Batch = (_ workerContext: NSManagedObjectContext) -> ()
-//    
-//    func performBackgroundBatchOperation(_ batch: @escaping Batch) {
-//        
-//        backgroundContext.perform() {
-//            
-//            batch(self.backgroundContext)
-//            
-//            // Save it to the parent context, so normal saving
-//            // can work
-//            do {
-//                try self.backgroundContext.save()
-//                print("background context saved")
-//            } catch {
-//                fatalError("Error while saving backgroundContext: \(error)")
-//            }
-//        }
-//    }
-//}
-

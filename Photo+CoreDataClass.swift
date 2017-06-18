@@ -12,12 +12,6 @@ import CoreData
 @objc(Photo)
 public class Photo: NSManagedObject {
     
-//    var photoLink {
-//        didSet{
-//            
-//        }
-//    }
-    
     convenience init(vacationLocation: VacationLocation, title: String = "photoName", photoLink: String, thumbnail: NSData?, latitude: Double, longitude: Double, context: NSManagedObjectContext ) {
         
         //         An EntityDescription is an object that has access to all

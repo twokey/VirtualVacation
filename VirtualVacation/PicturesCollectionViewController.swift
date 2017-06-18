@@ -19,8 +19,6 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     
     var sharedContext = CoreDataStack.sharedInstance.persistentContainer.viewContext
     var locationCoordinate = CLLocationCoordinate2D()
-
-//    var photos = [Photo]()
     
     fileprivate lazy var vacationLocation: VacationLocation = {
         
@@ -53,6 +51,7 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
     @IBOutlet weak var noPhotosLabel: UILabel!
     @IBOutlet weak var deletePhotosButton: UIBarButtonItem!
     
+    
     // MARK: Lifecycle
     
     override func viewDidLoad() {
@@ -60,11 +59,10 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
 
         // Set up UI
         collectionView = photosCollectionView
-        //photosCollectionView = collectionView
         title = "Location Photos"
-        self.noPhotosLabel.isHidden = true
-        self.reloadPhotosButton.isEnabled = false
-//        configureDeleteButton(selectedIndexes.count)
+        noPhotosLabel.isHidden = true
+        reloadPhotosButton.isEnabled = false
+
         
         // Set up Collection View Controller
         let space: CGFloat = 3.0
@@ -88,143 +86,71 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
         fetchedResultsCollectionController?.delegate = self
     }
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     
-
-            
-        
-//        for result in (self.fetchedResultsCollectionController?.fetchedObjects)! {
-//            
-//            let indexPath = self.fetchedResultsCollectionController?.indexPath(forObject: result)
-//            print(indexPath)
-//            let photo = result as! Photo
-//            
-//            
-//            if photo.thumbnail == nil {
-//                
-  //              let photoURL = URL(string: photo.photoLink)!
-                
-                
-                // Download pictures from urls array and populate Core Data table
-                
-//                let imageData = try? Data(contentsOf: photoURL)
-//                let imageData = UIImageJPEGRepresentation(#imageLiteral(resourceName: "Photo-1"), 1.0)
-        //        sharedContext.performAndWait {
-                    
-//                                    photo.thumbnail = imageData! as NSData
-          //      }
-//                print(imageData!)
-                
-                //photo.thumbnail = imageData! as NSData
-//                CoreDataStack.sharedInstance.saveContext()
-//                self.executeSearch()
-//                
-//            }
-//        }
-
-//        if (fetchedResultsCollectionController?.fetchedObjects?.count)! > 0 {
-//            downloadPhotos()
-//        } else {
-//            print("There is no photo!")
-//            self.reloadPhotosButton.isEnabled = true
-//        }
-
- //   }
-
-
-//    func downloadPhotos() {
-//        
-//        self.reloadPhotosButton.isEnabled = false
-//        
-//        for result in (fetchedResultsCollectionController?.fetchedObjects)! {
-//            
-//            let indexPath = fetchedResultsCollectionController?.indexPath(forObject: result)
-//            print(indexPath)
-//            let photo = result as! Photo
-//            
-//            
-//            if photo.thumbnail == nil {
-//                
-//                let photoURL = URL(string: photo.photoLink)!
-//                
-//                // Download pictures from urls array and populate Core Data table
-//                
-//                let imageData = try? Data(contentsOf: photoURL)
-//                
-//                print(imageData!)
-//                
-//                photo.thumbnail = imageData! as NSData
-//                CoreDataStack.sharedInstance.saveContext()
-//                self.executeSearch()
-//                
-//         
-//            }
-//
-//        }
-//        
-//        self.reloadPhotosButton.isEnabled = true
-//    }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        print("providing cell at index path \(indexPath)")
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PicturesCollectionViewCell
-        
-        DispatchQueue.main.async {
-            cell.cellImageView?.image = nil
-        }
-        
-        let photo = fetchedResultsCollectionController?.object(at: indexPath) as! Photo
-        
-        if let data = photo.thumbnail as Data? {
-            DispatchQueue.main.async {
-            let cellImage = UIImage(data: data)
-            // Configure cell
-            print(data)
-            cell.cellImageView?.image = cellImage
-            cell.activityIndicator.stopAnimating()
-
-            }
-
+        if (fetchedResultsCollectionController?.fetchedObjects?.count)! > 0 {
+            downloadPhotos()
         } else {
-            print("no image data")
-            cell.activityIndicator.startAnimating()
-            FlickrClient.SharedInstance.getPicturesFor(indexPath, photo: photo) { (data, image, error) in
+            print("There is no photo!")
+            noPhotosLabel.isHidden = false
+            reloadPhotosButton.isEnabled = true
+        }
+    }
+
+
+    func downloadPhotos() {
+    
+        self.reloadPhotosButton.isEnabled = false
+        
+        for result in (fetchedResultsCollectionController?.fetchedObjects)! {
+            
+            let photo = result as! Photo
+            
+            FlickrClient.SharedInstance.getPicturesFor(photo: photo) { (data, image, error) in
                 guard error == nil else {
-                    print(error)
+                    print(error ?? "")
                     return
-                }
-                DispatchQueue.main.async {
-                    cell.cellImageView?.image = image
-                    cell.activityIndicator.stopAnimating()
                 }
                 photo.thumbnail = data! as NSData
                 CoreDataStack.sharedInstance.saveContext()
             }
+        }
+        
+        self.reloadPhotosButton.isEnabled = true
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PicturesCollectionViewCell
+        
+        cell.cellImageView?.image = nil
+        cell.cellImageView?.alpha = 1.0
+        
+        let photo = fetchedResultsCollectionController?.object(at: indexPath) as! Photo
+        
+        if let data = photo.thumbnail as Data? {
+
+            let cellImage = UIImage(data: data)
+            // Configure cell
+            cell.cellImageView?.image = cellImage
+            cell.activityIndicator.stopAnimating()
+        }
+        else {
+            cell.activityIndicator.startAnimating()
          }
         
         return cell
     }
     
-    func deleteSelectedPhotos() {
-        var photosToDelete = [Photo]()
-        
-        for indexPath in selectedIndexes {
-            photosToDelete.append(fetchedResultsCollectionController?.object(at: indexPath) as! Photo)
-        }
-        
-        for photo in photosToDelete {
-            sharedContext.delete(photo)
-        }
-        
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        sharedContext.delete(fetchedResultsCollectionController?.object(at: indexPath) as! Photo)
         CoreDataStack.sharedInstance.saveContext()
         
-        selectedIndexes = [IndexPath]()
-
     }
-    
-    func updatePhotoAlbumFor() {
+
+    func updatePhotoAlbum() {
         
         let locationCoordinate = CLLocationCoordinate2D(latitude: vacationLocation.latitude, longitude: vacationLocation.longitude)
         
@@ -235,22 +161,16 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
                 return
             }
             
-            print(photoURLs)
-            
             DispatchQueue.main.async {
                 // Download pictures from urls array and populate Core Data table
                 for photoURL in photoURLs {
                     
                     // Create photo and image objects
                     let _ = Photo(vacationLocation: self.vacationLocation, title: "No title", photoLink: photoURL.absoluteString, thumbnail: nil, latitude: locationCoordinate.latitude, longitude: locationCoordinate.longitude, context: self.sharedContext)
-                    print(photoURL)
-                    
                 }
                 CoreDataStack.sharedInstance.saveContext()
                 self.executeSearch()
-//                self.collectionView!.reloadData()
-//                self.downloadPhotos()
-                
+                self.downloadPhotos()
             }
         }
     }
@@ -275,13 +195,6 @@ class PicturesCollectionViewController: CoreDataCollectionViewController {
 
         executeSearch()
         collectionView!.reloadData()
-        updatePhotoAlbumFor()
-    }
-    
-    @IBAction func deleteSelectedPhotosAction(_ sender: UIBarButtonItem) {
-        
-        deleteSelectedPhotos()
-//        self.collectionView?.reloadData()
-        
+        updatePhotoAlbum()
     }
 }

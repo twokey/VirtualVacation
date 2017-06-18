@@ -65,7 +65,7 @@ class MapViewController: UIViewController, NSFetchedResultsControllerDelegate {
         super.viewDidLoad()
         
         // Configure mapView
-        CoreDataStack.sharedInstance.applicationDocumentsDirectory()
+        title = "Virtual Tourist"
         mapView.delegate = self
         mapView.setRegion(mapViewRegion, animated: true)
         

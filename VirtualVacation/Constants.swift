@@ -10,14 +10,8 @@ import Foundation
 
 struct Constants {
     
-    
-    // MARK: Shared Instance
-//    static let sharedInstance = Constants()
-    
-    
+
     // MARK: Constants
-    
-    // API Values
     
     struct FlickrAPIValues {
         static let APIKey = "787b8a0c4f1436d4599a7be8c3b17c2b"
@@ -29,14 +23,10 @@ struct Constants {
         static let SearchLonRange = (-180.0, 180.0)
     }
     
-    // Parameter Keys
-    
     struct ParameterKeys {
         static let APIKey = "api_key"
     }
     
-    
-    // MARK: Flickr Parameter Keys
     struct FlickrParameterKeys {
         static let Method = "method"
         static let APIKey = "api_key"
@@ -51,7 +41,6 @@ struct Constants {
         static let PerPage = "per_page"
     }
     
-    // MARK: Flickr Parameter Values
     struct FlickrParameterValues {
         static let SearchMethod = "flickr.photos.search"
         static let APIKey = "787b8a0c4f1436d4599a7be8c3b17c2b"
@@ -64,7 +53,6 @@ struct Constants {
         static let UseSafeSearch = "1"
     }
     
-    // MARK: Flickr Response Keys
     struct FlickrResponseKeys {
         static let Status = "stat"
         static let Photos = "photos"
@@ -75,7 +63,6 @@ struct Constants {
         static let Total = "total"
     }
     
-    // MARK: Flickr Response Values
     struct FlickrResponseValues {
         static let OKStatus = "ok"
     }
